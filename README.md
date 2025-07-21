@@ -28,10 +28,24 @@ First, clone the project from GitHub:
 ```bash
 git clone <your-github-repo-url>
 cd <your-project-directory>
-2. Set Up a Virtual EnvironmentIt's highly recommended to use a Python virtual environment to manage dependencies.python3 -m venv venv
+
+
+2. Set Up a Virtual Environment
+It's highly recommended to use a Python virtual environment to manage dependencies.
+python3 -m venv venv
 source venv/bin/activate
-3. Install DependenciesInstall the required Python libraries using the requirements.txt file.pip install -r requirements.txt
-ConfigurationDHCP Sage is configured using a config.yaml file and environment variables.1. Create config.yamlCreate a config.yaml file in the root of the project directory. You can use the example below as a template. This file is safe to commit to Git as it contains no secrets.# config.yaml
+
+
+3. Install Dependencies
+Install the required Python libraries using the requirements.txt file.
+pip install -r requirements.txt
+
+
+Configuration
+DHCP Sage is configured using a config.yaml file and environment variables.
+1. Create config.yaml
+Create a config.yaml file in the root of the project directory. You can use the example below as a template. This file is safe to commit to Git as it contains no secrets.
+# config.yaml
 
 # --- MikroTik Router Configuration ---
 # These values will be read from environment variables.
@@ -107,7 +121,11 @@ ai_prompt: >
     
     - **IF** you suggested a new 'Device Label' in section 3 that is different from the current 'Label', THEN generate this exact line:
     `python3 dhcp_sage.py --mac {mac} --comment "Your new suggested label"`
-2. Set Environment VariablesBefore running the script, you must set the following environment variables in your terminal. This keeps your credentials secure and out of the codebase.# MikroTik Credentials
+
+
+2. Set Environment Variables
+Before running the script, you must set the following environment variables in your terminal. This keeps your credentials secure and out of the codebase.
+# MikroTik Credentials
 export MIKROTIKE_HOST="192.168.0.254"
 export MIKROTIK_USERNAME="your_admin_username"
 export NIKROTIK_PASSWORD="your_router_password"
@@ -115,12 +133,42 @@ export NIKROTIK_PASSWORD="your_router_password"
 # AI Provider API Keys
 export OPENAI_API_KEY="your_openai_api_key_here"
 export GEMINI_API_KEY="your_gemini_api_key_here"
-Note: These variables are only set for the current terminal session. To make them permanent, add them to your shell's profile script (e.g., ~/.zshrc, ~/.bash_profile).UsageHere are some examples of how to use DHCP Sage.List All Leasespython3 dhcp_sage.py --list
-Get an AI Analysis for a DeviceTo get a full AI-powered report on a specific device:python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --ai
-Provide Extra Context to the AIUse the --notes flag to give the AI more context for its analysis.python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --ai --notes "I think this is my new smart hub in the living room."
-Use a Specific AI Provider or ModelOverride the defaults set in your config.yaml for a single run.# Use OpenAI's gpt-4o model for this query
+
+
+Note: These variables are only set for the current terminal session. To make them permanent, add them to your shell's profile script (e.g., ~/.zshrc, ~/.bash_profile).
+Usage
+Here are some examples of how to use DHCP Sage.
+List All Leases
+python3 dhcp_sage.py --list
+
+
+Get an AI Analysis for a Device
+To get a full AI-powered report on a specific device:
+python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --ai
+
+
+Provide Extra Context to the AI
+Use the --notes flag to give the AI more context for its analysis.
+python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --ai --notes "I think this is my new smart hub in the living room."
+
+
+Use a Specific AI Provider or Model
+Override the defaults set in your config.yaml for a single run.
+# Use OpenAI's gpt-4o model for this query
 python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --ai --provider openai --model gpt-4o
-Set a CommentDirectly set a comment on a lease without running the AI analysis.python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --comment "Living Room Smart Hub"
-Make a Lease Staticpython3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --set-static
-Delete a Leasepython3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --delete
+
+
+Set a Comment
+Directly set a comment on a lease without running the AI analysis.
+python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --comment "Living Room Smart Hub"
+
+
+Make a Lease Static
+python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --set-static
+
+
+Delete a Lease
+python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --delete
+
+
 
