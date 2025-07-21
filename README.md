@@ -24,34 +24,47 @@ DHCP Sage is an AI-powered command-line tool for managing and analyzing DHCP lea
 Follow these steps to get DHCP Sage running on your local machine.
 
 ### 1. Clone the Repository
-First, clone the project from GitHub:
+
 ```bash
 git clone <your-github-repo-url>
 cd <your-project-directory>
+```
 
+### 2. Set Up a Virtual Environment
 
-2. Set Up a Virtual Environment
 It's highly recommended to use a Python virtual environment to manage dependencies.
+
+```bash
 python3 -m venv venv
 source venv/bin/activate
+```
 
+### 3. Install Dependencies
 
-3. Install Dependencies
-Install the required Python libraries using the requirements.txt file.
+Install the required Python libraries using the `requirements.txt` file.
+
+```bash
 pip install -r requirements.txt
+```
 
+---
 
-Configuration
-DHCP Sage is configured using a config.yaml file and environment variables.
-1. Create config.yaml
-Create a config.yaml file in the root of the project directory. You can use the example below as a template. This file is safe to commit to Git as it contains no secrets.
+## Configuration
+
+DHCP Sage is configured using a `config.yaml` file and environment variables.
+
+### 1. Create `config.yaml`
+
+Create a `config.yaml` file in the root of the project directory. You can use the example below as a template. This file is safe to commit to Git as it contains no secrets.
+
+```yaml
 # config.yaml
 
 # --- MikroTik Router Configuration ---
 # These values will be read from environment variables.
-host: ${MIKROTIKE_HOST}
+host: ${MIKROTIK_HOST}
 username: ${MIKROTIK_USERNAME}
-password: ${NIKROTIK_PASSWORD}
+password: ${MIKROTIK_PASSWORD}
 
 # --- AI Configuration ---
 # Set your default provider: 'openai' or 'gemini'
@@ -101,74 +114,89 @@ ai_prompt: >
 
   **5. Confidence Score:**
   Provide a score from 1 to 5 and briefly explain your reasoning.
-  
+
   ---COMMANDS---
-  
+
   **6. Actionable Commands:**
-  
+
   **Warning:** Only execute these commands if you understand their purpose and how to use them. Misuse can interrupt network functionality.
-  
+
   **RULES FOR GENERATING COMMANDS:**
   - **NEVER** use backticks, asterisks, or any markdown formatting for the commands.
   - **EACH COMMAND MUST BE ON ITS OWN SEPARATE LINE.**
-  
+
   - **IF** your recommendation in section 4 is 'REMOVE', THEN ONLY generate this single, exact line:
-  `python3 dhcp_sage.py --mac {mac} --delete`
-  
+  python3 dhcp_sage.py --mac {mac} --delete
+
   - **ELSE (if the recommendation is not REMOVE):**
     - **IF** the 'Static' status in the data is 'no' AND your recommendation in section 3 was 'Yes', THEN generate this exact line:
-    `python3 dhcp_sage.py --mac {mac} --set-static`
-    
+    python3 dhcp_sage.py --mac {mac} --set-static
+
     - **IF** you suggested a new 'Device Label' in section 3 that is different from the current 'Label', THEN generate this exact line:
-    `python3 dhcp_sage.py --mac {mac} --comment "Your new suggested label"`
+    python3 dhcp_sage.py --mac {mac} --comment "Your new suggested label"
+```
 
+### 2. Set Environment Variables
 
-2. Set Environment Variables
 Before running the script, you must set the following environment variables in your terminal. This keeps your credentials secure and out of the codebase.
+
+```bash
 # MikroTik Credentials
-export MIKROTIKE_HOST="192.168.0.254"
+export MIKROTIK_HOST="192.168.0.254"
 export MIKROTIK_USERNAME="your_admin_username"
-export NIKROTIK_PASSWORD="your_router_password"
+export MIKROTIK_PASSWORD="your_router_password"
 
 # AI Provider API Keys
 export OPENAI_API_KEY="your_openai_api_key_here"
 export GEMINI_API_KEY="your_gemini_api_key_here"
+```
 
+Note: These variables are only set for the current terminal session. To make them permanent, add them to your shell's profile script (e.g., `~/.zshrc`, `~/.bash_profile`).
 
-Note: These variables are only set for the current terminal session. To make them permanent, add them to your shell's profile script (e.g., ~/.zshrc, ~/.bash_profile).
-Usage
-Here are some examples of how to use DHCP Sage.
-List All Leases
+---
+
+## Usage
+
+Here are some examples of how to use DHCP Sage:
+
+### List All Leases
+
+```bash
 python3 dhcp_sage.py --list
+```
 
+### Get an AI Analysis for a Device
 
-Get an AI Analysis for a Device
-To get a full AI-powered report on a specific device:
+```bash
 python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --ai
+```
 
+### Provide Extra Context to the AI
 
-Provide Extra Context to the AI
-Use the --notes flag to give the AI more context for its analysis.
+```bash
 python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --ai --notes "I think this is my new smart hub in the living room."
+```
 
+### Use a Specific AI Provider or Model
 
-Use a Specific AI Provider or Model
-Override the defaults set in your config.yaml for a single run.
-# Use OpenAI's gpt-4o model for this query
+```bash
 python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --ai --provider openai --model gpt-4o
+```
 
+### Set a Comment
 
-Set a Comment
-Directly set a comment on a lease without running the AI analysis.
+```bash
 python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --comment "Living Room Smart Hub"
+```
 
+### Make a Lease Static
 
-Make a Lease Static
+```bash
 python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --set-static
+```
 
+### Delete a Lease
 
-Delete a Lease
+```bash
 python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --delete
-
-
-
+```
