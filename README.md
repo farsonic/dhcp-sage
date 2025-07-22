@@ -87,6 +87,10 @@ Here are some examples of how to use DHCP Sage:
 python3 dhcp-sage.py --list 
 ```
 
+<img width="1519" height="616" alt="Screenshot 2025-07-22 at 12 26 34 pm" src="https://github.com/user-attachments/assets/00d3799d-d3c5-408c-b544-9311ff8bc061" />
+
+
+
 ### Get an AI Analysis for a Device
 This will pass all known details about this MAC address to either ChatGPT or Gemini for Analysis and return a summary of information. 
 
