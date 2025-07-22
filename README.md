@@ -1,4 +1,4 @@
-# DHCP Sage
+# Mikrotik DHCP Sage
 
 ### *Wise counsel for your MikroTik network.*
 
@@ -26,8 +26,8 @@ Follow these steps to get DHCP Sage running on your local machine.
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-github-repo-url>
-cd <your-project-directory>
+git clone https://github.com/farsonic/dhcp-sage
+cd dhcp-sage
 ```
 
 ### 2. Set Up a Virtual Environment
@@ -55,86 +55,7 @@ DHCP Sage is configured using a `config.yaml` file and environment variables.
 
 ### 1. Create `config.yaml`
 
-Create a `config.yaml` file in the root of the project directory. You can use the example below as a template. This file is safe to commit to Git as it contains no secrets.
-
-```yaml
-# config.yaml
-
-# --- MikroTik Router Configuration ---
-# These values will be read from environment variables.
-host: ${MIKROTIK_HOST}
-username: ${MIKROTIK_USERNAME}
-password: ${MIKROTIK_PASSWORD}
-
-# --- AI Configuration ---
-# Set your default provider: 'openai' or 'gemini'
-ai_provider: gemini
-
-# API Keys will be read from environment variables.
-openai_api_key: ${OPENAI_API_KEY}
-gemini_api_key: ${GEMINI_API_KEY}
-
-# Set your preferred default models for each provider.
-# These can be overridden with the --model flag.
-gemini_model: "gemini-1.5-pro-latest"
-openai_model: "gpt-4-turbo"
-
-# --- AI Prompt ---
-# This is the master prompt that guides the AI's analysis.
-ai_prompt: >
-  You are a senior network security and performance analyst. Your task is to provide a comprehensive and actionable analysis of a network device using the following data. Your response must be structured with the headings provided below.
-
-  **Device Data:**
-  - MAC: {mac}
-  - IP: {ip}
-  - Hostname: {hostname}
-  - Label: {comment}
-  - Vendor: {vendor}
-  - Interface: {interface}
-  - Device Type: {description}
-  - Status: {status}
-  - Static: {static}
-  - Last Seen: {last_seen}
-  - User Notes: {notes}
-
-  **Analysis & Recommendations:**
-
-  **1. Executive Summary:**
-  Provide a detailed, plain-English summary of what this device is.
-
-  **2. Security Assessment:**
-  Analyze the device from a security perspective.
-
-  **3. Configuration Recommendation:**
-  - **Static IP:** State "Yes" or "No". Justify your answer.
-  - **Device Label:** Suggest an improved, descriptive label.
-
-  **4. Housekeeping Action:**
-  Recommend a single, clear action: KEEP, INVESTIGATE, or REMOVE.
-
-  **5. Confidence Score:**
-  Provide a score from 1 to 5 and briefly explain your reasoning.
-
-  ---COMMANDS---
-
-  **6. Actionable Commands:**
-
-  **Warning:** Only execute these commands if you understand their purpose and how to use them. Misuse can interrupt network functionality.
-
-  **RULES FOR GENERATING COMMANDS:**
-  - **NEVER** use backticks, asterisks, or any markdown formatting for the commands.
-  - **EACH COMMAND MUST BE ON ITS OWN SEPARATE LINE.**
-
-  - **IF** your recommendation in section 4 is 'REMOVE', THEN ONLY generate this single, exact line:
-  python3 dhcp_sage.py --mac {mac} --delete
-
-  - **ELSE (if the recommendation is not REMOVE):**
-    - **IF** the 'Static' status in the data is 'no' AND your recommendation in section 3 was 'Yes', THEN generate this exact line:
-    python3 dhcp_sage.py --mac {mac} --set-static
-
-    - **IF** you suggested a new 'Device Label' in section 3 that is different from the current 'Label', THEN generate this exact line:
-    python3 dhcp_sage.py --mac {mac} --comment "Your new suggested label"
-```
+Edit the config.yaml file if reequired. The only real things that need to be changed in here is the entries for host, passwords and API keys if you are hardcoding them, otherwise it will leverage ENV entries for thess. You should also specify the AI provider you want to use and the specific model. I've really only tested with Gemini and briefly with ChatGPT. 
 
 ### 2. Set Environment Variables
 
@@ -142,7 +63,7 @@ Before running the script, you must set the following environment variables in y
 
 ```bash
 # MikroTik Credentials
-export MIKROTIK_HOST="192.168.0.254"
+export MIKROTIK_HOST="192.168.0.1"
 export MIKROTIK_USERNAME="your_admin_username"
 export MIKROTIK_PASSWORD="your_router_password"
 
@@ -162,41 +83,53 @@ Here are some examples of how to use DHCP Sage:
 ### List All Leases
 
 ```bash
-python3 dhcp_sage.py --list
+python3 dhcp-sage.py --list
 ```
 
 ### Get an AI Analysis for a Device
 
 ```bash
-python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --ai
+python3 dhcp-sage.py --mac 68:EC:8A:0B:EC:4A --ai
+```
+
+### Get an AI Analysis for a Device and have AI determine a functional comment for the device based on Catagory, Function and Name. This is for a specific MAC address only. 
+
+```bash
+python3 dhcp-sage.py  --mac 68:EC:8A:0B:EC:4A --ai --auto-apply
+```
+
+### Get an AI Analysis for a Device and have AI determine a functional comment for the device based on Catagory, Function and Name. You can use the --only-uncommented option to automatically apply this to every bound DHCP entry that doesn't have a comment. This will ignore entries that have an existing comment. 
+
+```bash
+python3 dhcp-sage.py  --ai --auto-apply --only-uncommented
 ```
 
 ### Provide Extra Context to the AI
 
 ```bash
-python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --ai --notes "I think this is my new smart hub in the living room."
+python3 dhcp-sage.py --mac 68:EC:8A:0B:EC:4A --ai --notes "I think this is my new smart hub in the living room."
 ```
 
 ### Use a Specific AI Provider or Model
 
 ```bash
-python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --ai --provider openai --model gpt-4o
+python3 dhcp-sage.py --mac 68:EC:8A:0B:EC:4A --ai --provider openai --model gpt-4o
 ```
 
 ### Set a Comment
 
 ```bash
-python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --comment "Living Room Smart Hub"
+python3 dhcp-sage.py --mac 68:EC:8A:0B:EC:4A --comment "Living Room Smart Hub"
 ```
 
 ### Make a Lease Static
 
 ```bash
-python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --set-static
+python3 dhcp-sage.py --mac 68:EC:8A:0B:EC:4A --set-static
 ```
 
 ### Delete a Lease
 
 ```bash
-python3 dhcp_sage.py --mac 68:EC:8A:0B:EC:4A --delete
+python3 dhcp-sage.py --mac 68:EC:8A:0B:EC:4A --delete
 ```
