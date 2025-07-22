@@ -87,6 +87,8 @@ Here are some examples of how to use DHCP Sage:
 python3 dhcp-sage.py --list 
 ```
 
+You can filter using either the --bound or --waiting option if needed to only show entries that are in this state, otherwise it will show all current entries. 
+
 <img width="1519" height="616" alt="Screenshot 2025-07-22 at 12 26 34 pm" src="https://github.com/user-attachments/assets/00d3799d-d3c5-408c-b544-9311ff8bc061" />
 
 
