@@ -81,12 +81,14 @@ Note: These variables are only set for the current terminal session. To make the
 Here are some examples of how to use DHCP Sage:
 
 ### List All Leases
+(filter with --bound or --waiting) 
 
 ```bash
-python3 dhcp-sage.py --list (filter with --bound or --waiting) 
+python3 dhcp-sage.py --list 
 ```
 
 ### Get an AI Analysis for a Device
+This will pass all known details about this MAC address to either ChatGPT or Gemini for Analysis and return a summary of information. 
 
 ```bash
 python3 dhcp-sage.py --mac 68:EC:8A:0B:EC:4A --ai
