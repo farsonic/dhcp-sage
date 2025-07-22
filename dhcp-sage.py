@@ -180,7 +180,7 @@ def extract_structured_comment(text):
             json_str = match.group(0).strip().replace('`', '')
             parsed = json.loads(json_str)
             if all(k in parsed for k in ["category", "function", "name"]):
-                return f"{parsed['category']} -- {parsed['function']} -- {parsed['name']}"
+                return f"{parsed['category']} | {parsed['function']} | {parsed['name']}"
     except (json.JSONDecodeError, TypeError) as e:
         print(f"⚠️  Could not parse structured comment from AI response: {e}")
     return None
@@ -360,6 +360,8 @@ def main():
     parser.add_argument("--ai", action="store_true", help="Show AI-powered summary for a MAC address")
     parser.add_argument("--auto-apply", action="store_true", help="Automatically apply the AI-generated comment")
     parser.add_argument("--apply-all", action="store_true", help="Run AI analysis with auto-apply on all bound devices")
+    # --- NEW ARGUMENT ADDED ---
+    parser.add_argument("--only-uncommented", action="store_true", help="When using --apply-all, only process devices that do not have an existing comment")
     parser.add_argument("--json", action="store_true", help="Output results in JSON format")
     parser.add_argument("--provider", choices=['openai', 'gemini'], help="Specify AI provider")
     parser.add_argument("--model", help="Specify AI model to use (e.g., gpt-4o)")
@@ -401,7 +403,7 @@ def main():
         bridge_map = {e["mac-address"].upper(): e["interface"] for e in bridge_hosts if "mac-address" in e}
         iface_comments = {entry["name"]: entry.get("comment", entry["name"]) for entry in interfaces if "name" in entry}
 
-        # --- NEW: Main logic router ---
+        # --- Main logic router ---
         if args.apply_all:
             if not args.ai:
                 print("❌ --apply-all requires --ai to be specified.")
@@ -414,6 +416,12 @@ def main():
             for lease in bound_leases:
                 mac = lease.get("mac-address")
                 if not mac: continue
+
+                # --- NEW LOGIC: Check if the lease should be skipped ---
+                if args.only_uncommented and lease.get("comment", ""):
+                    print(f"⏩ Skipping {mac} (already has a comment: '{lease.get('comment')}')")
+                    continue
+
                 print(f"\n--- 👉 Processing {mac} ---")
                 process_lease_summary(base_url, auth, lease, bridge_map, iface_comments, use_ai=True, ai_provider=ai_provider, api_key=api_key, model_name=model_name, prompt_template=prompt_template, notes=args.notes, json_output=args.json, auto_apply=True)
             print("\n🎉 Bulk processing complete.")
@@ -425,7 +433,6 @@ def main():
         elif args.mac:
             lease_to_modify = find_lease_by_mac(all_leases, args.mac)
             
-            # Handle actions that require a lease to exist
             if args.set_static or args.comment is not None or args.delete:
                 if not lease_to_modify:
                     print(f"❌ MAC address {args.mac} not found in leases. Cannot perform action.")
@@ -445,7 +452,6 @@ def main():
                     print("✅ Done.")
                     return
 
-            # If no action was taken, show the summary
             if not any([args.set_static, args.comment is not None, args.delete]):
                 show_mac_summary(base_url, auth, args.mac, bridge_map, iface_comments, all_leases, use_ai=args.ai, ai_provider=ai_provider, api_key=api_key, model_name=model_name, prompt_template=prompt_template, notes=args.notes, json_output=args.json, auto_apply=args.auto_apply)
         else:
