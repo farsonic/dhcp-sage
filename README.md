@@ -100,6 +100,11 @@ This will pass all known details about this MAC address to either ChatGPT or Gem
 python3 dhcp-sage.py --mac 68:EC:8A:0B:EC:4A --ai
 ```
 
+
+<img width="685" height="661" alt="Screenshot 2025-07-22 at 12 33 10 pm" src="https://github.com/user-attachments/assets/0b524731-059e-4843-9af6-dfb87045088d" />
+
+
+
 ### Get an AI Analysis for a Device and have AI determine a functional comment for the device based on Catagory, Function and Name. This is for a specific MAC address only. 
 
 ```bash
