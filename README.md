@@ -83,7 +83,7 @@ Here are some examples of how to use DHCP Sage:
 ### List All Leases
 
 ```bash
-python3 dhcp-sage.py --list
+python3 dhcp-sage.py --list (filter with --bound or --waiting) 
 ```
 
 ### Get an AI Analysis for a Device
